@@ -1,0 +1,107 @@
+/* Style CSS LOGIN */
+.card .illustration-image {
+    width: auto; /*  lebar gambar secara otomatis */
+    height: auto; /* tinggi gambar */
+    max-height: none; /* Hapus batas tinggi jika ada */
+}
+
+/* Style CSS Project */
+/* Menambahkan warna latar belakang abu-abu muda */
+body {
+    /* background-color: #f7f7f7;  */
+    background-color: #f1f1f1;
+}
+
+.navbar,
+.bg-body-tertiary {
+    background-color: white;
+}
+/* Mengubah warna tombol "Tambah Project" */
+.btn-secondary {
+    background-color: #818898; /* Warna tombol */
+    border-color: #818898; /* Warna border tombol */
+    color: white; /* Warna teks di tombol */
+}
+
+.card {
+    min-height: 200px; /* Tinggi minimum card */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: none; /* Menghilangkan garis border */
+    box-shadow: none; /* Menghilangkan bayangan jika ada */
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Atur ukuran logo agar tetap */
+.card img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px; /* Jarak antara logo dan nama */
+}
+
+/* Mengatur nama project agar tidak melebihi ruang */
+.project-name h5 {
+    /* webkit-line-clamp yang berguna untuk membatasi jumlah baris teks yang akan ditampilkan. */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; /* Batasi maksimal 2 baris */
+    overflow: hidden; /* Sembunyikan teks berlebih */
+    text-overflow: ellipsis; /* Tambahkan ellipsis jika teks terlalu panjang */
+    max-width: 200px; /* Batasi lebar nama project */
+    font-size: 20px; /* Ukuran font */
+    line-height: 1.2; /* Jarak antar baris */
+    margin: 0; /* Hilangkan margin tambahan */
+}
+
+/* Menggeser bagian requirement ke bawah */
+.requirement {
+    margin-top: 20px;
+}
+
+.dropdown-toggle::after {
+    display: none; /* Menyembunyikan panah dropdown */
+}
+
+/* Mengubah warna tombol dropdown */
+.dropdown-toggle {
+    background-color: #ffffff; /* Warna latar belakang tombol dropdown */
+    border: none; /* Menghilangkan border */
+    color: #818898; /* Warna teks pada tombol dropdown */
+}
+
+/* Mengubah warna tombol dropdown */
+.dropdown-toggle {
+    background-color: #ffffff; /* Warna latar belakang tombol dropdown */
+    border: none; /* Menghilangkan border */
+    color: #818898; /* Warna teks pada tombol dropdown */
+}
+
+/* Mensejajarkan titik 2 pada detail test suite */
+.label {
+    display: inline-block;
+    width: 150px; /* Sesuaikan lebar sesuai kebutuhan */
+}
+.value {
+    display: inline-block;
+}
+
+/* Style Komentar */
+.custom-card {
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    padding: 10px;
+}
+
+.dropdown-toggle {
+    margin-top: -10px; /* Sesuaikan sesuai kebutuhan */
+}
+
+.value {
+    line-height: 1.6;
+}

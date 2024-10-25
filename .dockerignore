@@ -1,0 +1,17 @@
+# Ignore everything
+*
+
+# Allow files and directories
+!/app
+!/bootstrap
+!/config
+!/database
+!/public
+!/resources
+!/routes
+!/storage
+!/vendor
+!/artisan
+!/.env
+!/composer.json
+!/composer.lock

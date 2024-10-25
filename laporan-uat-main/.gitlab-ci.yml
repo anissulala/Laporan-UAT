@@ -1,0 +1,198 @@
+variables:
+  STACK_NAME: magang12
+  IMAGE_NAMESPACE: magang12
+  PREBUILD_COMPOSE: .gitlab-ci/prebuild/docker-compose.yml
+  BASE_COMPOSE: .gitlab-ci/base/docker-compose.yml
+  BUILD_COMPOSE: .gitlab-ci/build/docker-compose.yml
+
+.deploy-template: &deploy-template
+  stage: deploy
+  tags:
+    - common
+    - shell-runner
+    - docker
+
+  after_script:
+    - |
+      if [[ -f .gitlab-ci/helper_script.sh ]]; then
+        source .gitlab-ci/helper_script.sh
+        kill_sshagent $CI_COMMIT_SHA
+      fi
+
+  environment:
+    name: $STAGE
+    url: https://$DOMAIN
+
+  resource_group: $STAGE
+
+.deploy-script: &deploy-script
+  - git reset --mixed $CI_COMMIT_SHA
+  - git checkout --
+    $PREBUILD_COMPOSE
+    .gitlab-ci/build/
+    .gitlab-ci/deploy/$STAGE/
+    .dockerignore
+
+  - curl -kso .gitlab-ci/helper_script.sh ${HELPER_SCRIPT_URL}
+  - source .gitlab-ci/helper_script.sh
+
+  # setup env
+  - cp "$ENV" .env
+
+  # build image
+  - setup_image $BUILD_COMPOSE $VERSION
+
+  # persiapan deploy
+  - start_ssh_agent $CI_COMMIT_SHA
+  - ssh-add -t 600 <(echo "$SERVER_KEY")
+
+  - docker-compose -f $PREBUILD_COMPOSE pull --quiet
+
+  # update service
+  - VARS="HUB STACK_NAME IMAGE_NAMESPACE VERSION DOMAIN"
+  - deploy_image "$SERVER" "$VARS" $STACK_NAME .gitlab-ci/deploy/$STAGE/docker-compose.yml
+
+stages:
+  - prebuild
+  - build
+  - test
+  - deploy
+
+build helper image:
+  stage: prebuild
+  tags:
+    - common
+    - shell-runner
+    - docker
+
+  only:
+    refs:
+      - demo
+      - devel
+      - real
+    changes:
+      - .gitlab-ci.yml
+      - .gitlab-ci/prebuild/**/*
+
+  variables:
+    GIT_CHECKOUT: "false"
+    GIT_STRATEGY: fetch
+
+    STAGE: $CI_COMMIT_REF_NAME
+
+  script:
+    - git reset --mixed $CI_COMMIT_SHA
+    - git checkout --
+      .gitlab-ci/prebuild/
+
+    - echo '*' > .dockerignore
+
+    - docker-compose -f $PREBUILD_COMPOSE pull --quiet --ignore-pull-failures
+    - docker-compose -f $PREBUILD_COMPOSE build
+    - docker-compose -f $PREBUILD_COMPOSE push
+
+build base image:
+  stage: prebuild
+  tags:
+    - common
+    - shell-runner
+    - docker
+
+  only:
+    refs:
+      - demo
+      - devel
+      - real
+    changes:
+      - .gitlab-ci.yml
+      - .gitlab-ci/base/**/*
+
+  variables:
+    GIT_CHECKOUT: "false"
+    GIT_STRATEGY: fetch
+
+    STAGE: $CI_COMMIT_REF_NAME
+
+  script:
+    - git reset --mixed $CI_COMMIT_SHA
+    - git checkout --
+      $BASE_COMPOSE
+      .gitlab-ci/base/
+
+    - docker-compose -f $BASE_COMPOSE pull --quiet --ignore-pull-failures
+    - docker-compose -f $BASE_COMPOSE build
+    - docker-compose -f $BASE_COMPOSE push
+
+build backend:
+  stage: build
+  tags:
+    - common
+    - shell-runner
+    - docker
+
+  only:
+    - demo
+    - devel
+    - real
+
+  cache:
+    key: $CI_JOB_NAME-$CI_COMMIT_REF_SLUG
+    paths:
+      - vendor/
+
+  artifacts:
+    name: $CI_JOB_NAME-$CI_COMMIT_REF_SLUG
+    paths:
+      - app
+      - bootstrap
+      - config
+      - database
+      - public
+      - resources
+      - routes
+      - storage
+      - vendor
+      - artisan
+      - composer.json
+      - composer.lock
+
+  variables:
+    STAGE: $CI_COMMIT_REF_NAME
+
+  script:
+    - mkdir -p
+      $HOME/.runner-home
+
+    - docker-compose -f $PREBUILD_COMPOSE pull --quiet
+    - docker-compose -f $PREBUILD_COMPOSE run --rm
+      --user `id -u`:`id -g`
+      --volume $HOME/.runner-home:/home
+      build bash -c "cd .
+      && php composer.phar install --prefer-dist --no-dev"
+
+    - find storage/ -type d \! -perm 777 -print -execdir chmod a+rwx \{\} \;
+    - find bootstrap/ -type d \! -perm 777 -print -execdir chmod a+rwx \{\} \;
+
+deploy ke devel:
+  <<: *deploy-template
+  only:
+    - devel
+
+  variables:
+    GIT_CHECKOUT: "false"
+    GIT_STRATEGY: fetch
+
+    DOMAIN: $DEVEL_DOMAIN
+    HUB: $DEVEL_HUB
+    MEMCACHED: $DEVEL_MEMCACHED
+    SERVER: $DEVEL_SERVER
+    SERVER_KEY: $DEVEL_SERVER_KEY
+    STAGE: $CI_COMMIT_REF_NAME
+    VERSION: $CI_COMMIT_SHORT_SHA
+    WORKER_REPLICAS: $DEVEL_WORKER_REPLICAS
+
+  script:
+    # handle manual variabel tipe file karena gitlab belum setup konten file
+    - export ENV=$DEVEL_ENV
+
+    - *deploy-script

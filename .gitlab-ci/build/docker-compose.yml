@@ -1,0 +1,14 @@
+services:
+  laporan-uat:
+    image: ${HUB}/${IMAGE_NAMESPACE}/laporan-uat-${STAGE}:${VERSION:-latest}
+    build:
+      context: ../..
+      dockerfile: .gitlab-ci/build/backend/Dockerfile
+      cache_from:
+        - ${HUB}/${IMAGE_NAMESPACE}/laporan-uat-${STAGE}:latest
+      args:
+        - PREBUILD_HUB
+        - IMAGE_NAMESPACE
+        - STAGE
+        - DOMAIN
+        - MEMCACHED

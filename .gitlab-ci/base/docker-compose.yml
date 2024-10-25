@@ -1,0 +1,8 @@
+services:
+  laporan-uat:
+    image: ${PREBUILD_HUB}/${IMAGE_NAMESPACE}/base-laporan-uat-${STAGE}:latest
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      cache_from:
+        - ${PREBUILD_HUB}/${IMAGE_NAMESPACE}/base-laporan-uat-${STAGE}:latest
