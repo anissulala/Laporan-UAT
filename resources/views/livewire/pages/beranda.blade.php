@@ -1,4 +1,9 @@
 <div>
+    <div class="container mt-4">
+        <h5 class="mb-3">Grafik Jumlah Hasil Test</h5>
+        <canvas id="hasilTestChart"></canvas>
+    </div>
+
     <!-- Hasil Test Saya Table -->
     <div class="container mt-4">
         <h5 class="mb-3">Hasil Test Saya</h5>
@@ -20,8 +25,9 @@
                                 $test_result->testCase->testSuite->project->id ?? '#',
                                 $test_result->testCase->testSuite->id ?? '#',
                                 $test_result->testCase->id ?? '#',
-                                $test_result->id
-                            ]) }}'" style="cursor: pointer;">
+                                $test_result->id,
+                            ]) }}'"
+                                style="cursor: pointer;">
                                 <td>{{ $test_result->kode }}</td>
                                 <td>{{ $test_result->harapan }}</td>
                                 <td>{{ $test_result->realisasi }}</td>
@@ -54,8 +60,9 @@
                             <tr onclick="window.location='{{ route('testcase.index', [
                                 $test_case->testSuite->project->id ?? '#',
                                 $test_case->testSuite->id ?? '#',
-                                $test_case->id
-                            ]) }}'" style="cursor: pointer;">
+                                $test_case->id,
+                            ]) }}'"
+                                style="cursor: pointer;">
                                 <td>{{ $test_case->kode }}</td>
                                 <td>{{ $test_case->judul }}</td>
                                 <td>
@@ -96,10 +103,8 @@
                     </thead>
                     <tbody>
                         @foreach ($testSuites as $suite)
-                            <tr onclick="window.location='{{ route('testsuite.index', [
-                                $suite->project->id ?? '#',
-                                $suite->id
-                            ]) }}'" style="cursor: pointer;">   
+                            <tr onclick="window.location='{{ route('testsuite.index', [$suite->project->id ?? '#', $suite->id]) }}'"
+                                style="cursor: pointer;">
                                 <td>{{ $suite->kode }}</td>
                                 <td>{{ $suite->project ? $suite->project->nama : '-' }}</td>
                                 <td>{{ $suite->judul }}</td>
@@ -124,3 +129,50 @@
         </div>
     </div>
 </div>
+
+{{-- script chart.js --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartData = @json($chartData); // Data dari backend
+
+        // Pisahkan data label dan total untuk digunakan di Chart.js
+        const labels = chartData.map(item => item.label);
+        const data = chartData.map(item => item.total);
+
+        const ctx = document.getElementById('hasilTestChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels, // Label untuk Test Results, Test Cases, Test Suites
+                datasets: [{
+                    label: 'Jumlah Data',
+                    data: data, // Jumlah dari Test Results, Test Cases, Test Suites
+                    backgroundColor: [
+                        '#FAC307', // Warna kuning untuk Test Results
+                        '#36A2EB', // Warna biru untuk Test Cases
+                        '#3B3C98', // Warna hijau untuk Test Suites
+                    ],
+                    borderColor: [
+                        '#FAC307', // Border warna kuning untuk Test Results
+                        '#36A2EB', // Border warna biru untuk Test Cases
+                        '#3B3C98', // Border warna hijau untuk Test Suites
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+
