@@ -2,41 +2,42 @@
 
 namespace App\Livewire\Components\Projects;
 
+use App\Livewire\Forms\Projects\CreateForm;
 use App\Models\Project;
-use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('components.layouts.app')]
 class Create extends Component
 {
-    public $nama;
-    public $deskripsi;
+    public CreateForm $form;
 
+    /**
+     * Method untuk menyimpan project baru setelah validasi.
+     */
     public function store()
     {
-        $this->validate([
-            'nama' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
+        // Lakukan validasi menggunakan aturan dari form object
+        $this->form->validate();
+
+        // Simpan data project ke database
+        $project = Project::create([
+            'nama' => $this->form->nama,
+            'deskripsi' => $this->form->deskripsi,
         ]);
 
+        // Reset input setelah berhasil menyimpan
+        $this->form->reset(['nama', 'deskripsi']);
 
-         // Simpan data project
-         $project = Project::create([
-            'nama' => $this->nama,
-            'deskripsi' => $this->deskripsi,
-        ]);
-
-        //name agar hilang
-        $this->nama = NULL;
-        $this->deskripsi = NULL;
-
-        Session()->flash('success', 'Project berhasil ditambahkan!');
+        session()->flash('success', 'Project berhasil ditambahkan!');
 
         // Redirect ke halaman test suite
         return redirect()->route('testsuite.index', ['projectId' => $project->id]);
     }
 
+    /**
+     * Render view untuk form pembuatan project.
+     */
     public function render()
     {
         return view('livewire.components.projects.create');

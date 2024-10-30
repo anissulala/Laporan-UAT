@@ -12,9 +12,9 @@
                     <!-- Nama Project -->
                     <div class="mb-3">
                         <label for="nama" class="form-label">Nama</label>
-                        <input type="text" class="form-control @error('nama') is-invalid @enderror" wire:model="nama"
-                            placeholder="Masukkan Nama Project">
-                        @error('nama')
+                        <input type="text" class="form-control @error('form.nama') is-invalid @enderror"
+                            wire:model="form.nama" placeholder="Masukkan Nama Project">
+                        @error('form.nama')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -22,8 +22,9 @@
                     <!-- Deskripsi Project -->
                     <div class="mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi</label>
-                        <textarea class="form-control @error('deskripsi') is-invalid @enderror" wire:model="deskripsi" rows="3" placeholder="Masukkan Deskripsi"></textarea>
-                        @error('deskripsi')
+                        <textarea class="form-control @error('form.deskripsi') is-invalid @enderror" wire:model="form.deskripsi" rows="3"
+                            placeholder="Masukkan Deskripsi"></textarea>
+                        @error('form.deskripsi')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
