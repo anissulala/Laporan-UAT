@@ -44,6 +44,7 @@ class Index extends Component
         $test_results = TestResult::with(['userPenugasan', 'status'])
             ->where('test_case_id', $this->testCaseId)
             ->search($this->search) // Memanggil scopeSearch dari model TestResult
+            ->orderBy('kode', 'asc') //pengurutan
             ->paginate(5);
 
         $this->test_results_count = $test_results->total();
