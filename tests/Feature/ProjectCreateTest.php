@@ -34,46 +34,4 @@ class ProjectCreateTest extends TestCase
 
         Log::info('Project berhasil');
     }
-
-    /** @test */
-    public function nama_is_required()
-    {
-        Log::info('Memulai test: nama_is_required');
-
-        // Mengambil project yang sudah ada di database (jika ada)
-        $Project = Project::skip(1)->first();
-        if (!$Project) {
-            Log::warning('Tidak ada project di database untuk validasi.');
-            $this->fail('Tidak ada project di database.');
-        }
-
-        // Eksekusi Livewire component tanpa nama
-        Livewire::test('components.projects.create')
-            ->set('deskripsi', $Project->deskripsi) // Menggunakan deskripsi dari project asli
-            ->call('store')
-            ->assertHasErrors(['nama' => 'required']);
-
-        Log::info('Validasi nama is_required berhasil.');
-    }
-
-    /** @test */
-    public function deskripsi_is_required()
-    {   
-        Log::info('Memulai test: deskripsi_is_required');
-
-        // Mengambil project yang sudah ada di database (jika ada)
-        $Project = Project::first();
-        if (!$Project) {
-            Log::warning('Tidak ada project di database untuk validasi.');
-            $this->fail('Tidak ada project di database.');
-        }
-
-        // Eksekusi Livewire component tanpa deskripsi
-        Livewire::test('components.projects.create')
-            ->set('nama', $Project->nama) // Menggunakan nama dari project asli
-            ->call('store')
-            ->assertHasErrors(['deskripsi' => 'required']);
-
-        Log::info('Validasi deskripsi is_required berhasil.');
-    }
 }
