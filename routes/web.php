@@ -1,10 +1,13 @@
 <?php
 
+use App\Livewire\BookCount;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Pages\Beranda;
 
 Route::get('/', Beranda::class)
     ->name('beranda');
+
+Route::get('/book', BookCount::class);
 
 Route::get('/login', App\Livewire\Pages\Login\Index::class)
     ->name('login.index');
